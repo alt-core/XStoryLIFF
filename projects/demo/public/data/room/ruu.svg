@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 432">
+  <ellipse cx="135" cy="414" rx="116" ry="13" fill="#0e0922" opacity="0.4"/>
+  <!-- 座布団 -->
+  <ellipse cx="135" cy="400" rx="114" ry="26" fill="#d9706a"/>
+  <ellipse cx="135" cy="389" rx="114" ry="26" fill="#ff9c8f"/>
+  <ellipse cx="116" cy="382" rx="66" ry="11" fill="#ffc3b8" opacity="0.55"/>
+  <circle cx="135" cy="389" r="4" fill="#d9706a"/>
+  <!-- ケープ -->
+  <path d="M50 392C44 330 72 262 135 246C198 262 226 330 220 392Q135 406 50 392Z" fill="#8a83e6"/>
+  <path d="M135 246C198 262 226 330 220 392Q190 398 172 397C186 330 172 278 135 246Z" fill="#716ad4"/>
+  <path d="M52 378Q135 394 218 378L220 392Q135 406 50 392Z" fill="#625bc6"/>
+  <path d="M56 380C52 330 76 276 118 254" fill="none" stroke="#cbc6ff" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+  <polygon points="135.0,357.0 137.4,362.7 143.6,363.2 138.9,367.3 140.3,373.3 135.0,370.1 129.7,373.3 131.1,367.3 126.4,363.2 132.6,362.7" fill="#ffc873" stroke="#ffc873" stroke-width="2.7" stroke-linejoin="round" />
+  <!-- マグと手 -->
+  <path d="M130 288q-7-9 1-17t0-16M146 288q-7-9 1-17" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+  <rect x="113" y="296" width="44" height="40" rx="9" fill="#fff3dc"/>
+  <rect x="113" y="306" width="44" height="6" fill="#ffc873"/>
+  <path d="M157 304q14 1 12 14t-12 10" fill="none" stroke="#fff3dc" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="112" cy="324" rx="12.5" ry="11.5" fill="#ffe7d4"/>
+  <ellipse cx="160" cy="326" rx="12" ry="11" fill="#ffe7d4"/>
+  <ellipse cx="108" cy="320" rx="5" ry="3.5" fill="#ffffff" opacity="0.45"/>
+  <!-- 留め具 -->
+  <circle cx="135" cy="262" r="8" fill="#ffc873"/>
+  <polygon points="135.0,257.8 136.1,260.5 139.0,260.7 136.8,262.6 137.5,265.4 135.0,263.9 132.5,265.4 133.2,262.6 131.0,260.7 133.9,260.5" fill="#fff0c9" stroke="#fff0c9" stroke-width="1.3" stroke-linejoin="round" />
+  <!-- フード -->
+  <path d="M48 170C44 112 70 72 100 62L92 16L130 50C134 49 136 49 140 50L178 16L170 62C200 72 226 112 222 170C220 222 190 258 135 260C80 258 50 222 48 170Z" fill="#8a83e6"/>
+  <path d="M100 30L105 60L120 52Z" fill="#bdb7ff"/>
+  <path d="M170 30L165 60L150 52Z" fill="#bdb7ff"/>
+  <path d="M52 168C50 118 72 84 100 70" fill="none" stroke="#cbc6ff" stroke-width="3.5" stroke-linecap="round" opacity="0.6"/>
+  <ellipse cx="135" cy="170" rx="78" ry="77" fill="#5f58c2"/>
+  <!-- 顔 -->
+  <ellipse cx="135" cy="174" rx="68" ry="64" fill="#ffe7d4"/>
+  <path d="M86 214q49 34 98 0q-10 28-49 30q-39-2-49-30Z" fill="#f7cfb6" opacity="0.55"/>
+  <!-- 髪 -->
+  <path d="M67 160C70 120 100 102 135 102C170 102 200 120 203 160C193 142 181 136 171 148C163 130 151 126 141 140C131 124 115 128 107 146C97 134 81 142 67 160Z" fill="#3b3374"/>
+  <path d="M68 158Q63 192 77 216Q80 190 86 168Z" fill="#3b3374"/>
+  <path d="M202 158Q207 192 193 216Q190 190 184 168Z" fill="#3b3374"/>
+  <path d="M112 116q16-8 34-4" fill="none" stroke="#6b61b8" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  <!-- 星の髪飾り -->
+  <polygon points="188.0,87.0 190.9,94.0 198.5,94.6 192.7,99.5 194.5,106.9 188.0,103.0 181.5,106.9 183.3,99.5 177.5,94.6 185.1,94.0" fill="#ffc873" stroke="#ffc873" stroke-width="3.3" stroke-linejoin="round" transform="rotate(12 188 98)"/>
+  <!-- 表情 -->
+    
+  <ellipse cx="110" cy="180" rx="10.5" ry="13.5" fill="#2c2452"/>
+  <ellipse cx="110" cy="186" rx="7" ry="5.5" fill="#5f55c6" opacity="0.85"/>
+  <circle cx="113.5" cy="174" r="4" fill="#ffffff"/>
+  <circle cx="106.5" cy="187" r="1.8" fill="#ffffff" opacity="0.8"/>
+  <path d="M97 172q13-12 26 0" fill="none" stroke="#2c2452" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="160" cy="180" rx="10.5" ry="13.5" fill="#2c2452"/>
+  <ellipse cx="160" cy="186" rx="7" ry="5.5" fill="#5f55c6" opacity="0.85"/>
+  <circle cx="163.5" cy="174" r="4" fill="#ffffff"/>
+  <circle cx="156.5" cy="187" r="1.8" fill="#ffffff" opacity="0.8"/>
+  <path d="M147 172q13-12 26 0" fill="none" stroke="#2c2452" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="91" cy="202" rx="11.5" ry="6.5" fill="#ffa99d" opacity="0.75"/>
+  <ellipse cx="179" cy="202" rx="11.5" ry="6.5" fill="#ffa99d" opacity="0.75"/>
+    <path d="M128 207q7 6 14 0" fill="none" stroke="#7a3f4f" stroke-width="3" stroke-linecap="round"/>
+</svg>

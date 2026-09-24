@@ -1,0 +1,24 @@
+/*
+  作品ごとのスキン。画面の多くは画像（public/skin/）で作り、ここでは色と、画像に重ねる文字の位置を決める。
+  ここに書いた値は、エンジンの既定値と同じ（既定値は、このデモのスキンに合わせてある）。
+*/
+:root {
+  /* ページ全体の背景色（画像の背景の下と、読み込みの間） */
+  --background: #0d1030;
+
+  /* ステータス表示の数値（背景の画像 bg_status の上に重ねる）。枠（左端と幅）は、画像の数値の欄に合わせてある */
+  --xl-status-color: #fff4dc;
+  --xl-status-font: var(--xl-story-font);
+  --xl-status-font-weight: 700;
+  --xl-status-top: 4.06vw;
+  --xl-status-lv-left: 29.2vw;
+  --xl-status-lv-width: 15vw;
+  --xl-status-words-left: 68.6vw;
+  --xl-status-words-width: 15vw;
+
+  /* 台詞の文字色（吹き出しの画像の上に重ねる） */
+  --xl-bubble-text: #2b2546;
+
+  /* ことば帳の見出しの帯 */
+  --xl-words-header-color: #3b3f86;
+}

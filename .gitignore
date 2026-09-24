@@ -1,0 +1,21 @@
+# 依存関係
+node_modules/
+
+# ビルド成果物
+dist/
+
+# 環境変数（.env には使う作品の選択を書いてコミットできる。LIFF の設定などは .env.local に書く）
+.env.local
+.env.*.local
+
+# ローカルの作業用ファイル
+/.projects/
+
+# Claude Code の個人設定
+.claude/settings.local.json
+
+# OS・エディタ
+.DS_Store
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "name": "友だち追加で、最初のことばが入る",
+      "steps": [
+        {
+          "input": {"type": "start"},
+          "expect": {
+            "texts": ["こんばんは。わたしはルゥ。月灯りの部屋に住んでいるの。", "「へや」と送るか、トークルームのメニューから、わたしの部屋をのぞいてみて。"],
+            "flags": {"$lv": 1, "$word_count": 2}
+          }
+        }
+      ]
+    },
+    {
+      "name": "話しかけたことばが、ことば帳に増える（同じ語は1回だけ）",
+      "steps": [
+        {"input": {"type": "start"}},
+        {
+          "input": {"type": "text", "text": "こんばんは"},
+          "expect": {"texts": ["こんばんは。来てくれて、うれしい。"], "flags": {"$greeted": true, "$word_count": 3}}
+        },
+        {
+          "input": {"type": "text", "text": "月"},
+          "expect": {"texts": ["月……そう、「つき」。思い出した。ことば帳に書いておくね。"], "flags": {"$word_count": 4}}
+        },
+        {
+          "input": {"type": "text", "text": "月"},
+          "expect": {"flags": {"$word_count": 4}}
+        }
+      ]
+    },
+    {
+      "name": "長い語は、その一部の語より先に当てはまる",
+      "steps": [
+        {"input": {"type": "start"}},
+        {
+          "input": {"type": "text", "text": "月明かり"},
+          "expect": {"texts": ["月明かり……？　まだ、思い出せないの。"], "flags": {"$word_count": 2}}
+        }
+      ]
+    },
+    {
+      "name": "ことば帳の「かぎ」を押して届いた「かぎ」に答える",
+      "steps": [
+        {"input": {"type": "start"}},
+        {
+          "input": {"type": "text", "text": "かぎ"},
+          "expect": {"texts": ["机の引き出しの鍵……かもしれない。", "今度、いっしょに探してみようね。"]}
+        }
+      ]
+    },
+    {
+      "name": "「へや」で、部屋とことば帳を開くボタンを出す",
+      "steps": [
+        {"input": {"type": "start"}},
+        {
+          "input": {"type": "text", "text": "へや"},
+          "expect": {"choices": [{"type": "uri", "label": "部屋へ"}, {"type": "uri", "label": "ことば帳"}]}
+        }
+      ]
+    },
+    {
+      "name": "知らない発言",
+      "steps": [
+        {"input": {"type": "start"}},
+        {
+          "input": {"type": "text", "text": "てきとう"},
+          "expect": {"texts": ["……？　ことば帳のことばや、思いついたことばで話しかけてみてね。"]}
+        }
+      ]
+    }
+  ]
+}

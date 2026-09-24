@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 360">
+  <ellipse cx="75" cy="352" rx="52" ry="7" fill="#100b24" opacity="0.4"/>
+  <!-- 葉 -->
+  <g>
+    <path d="M74 262C60 200 20 170 8 110c36 16 62 60 70 150Z" fill="#3f8f76"/>
+    <path d="M74 262C62 212 36 176 20 128" fill="none" stroke="#2f735f" stroke-width="3" stroke-linecap="round"/>
+    <path d="M76 262C92 196 130 176 144 120c-38 14-64 60-68 142Z" fill="#3f8f76"/>
+    <path d="M76 262C88 214 114 180 132 134" fill="none" stroke="#2f735f" stroke-width="3" stroke-linecap="round"/>
+    <path d="M74 262C50 190 44 90 70 16c26 60 30 150 4 246Z" fill="#56aa8c"/>
+    <path d="M74 262C64 190 62 110 70 30" fill="none" stroke="#3f8f76" stroke-width="3" stroke-linecap="round"/>
+    <path d="M76 262c20-60 50-96 70-104-6 44-40 80-70 104Z" fill="#6cc3a3"/>
+    <path d="M74 262c-18-56-48-82-68-88 6 40 36 70 68 88Z" fill="#6cc3a3"/>
+    <path d="M70 60c-4 10-2 22 4 30M68 120c-6 14-4 30 4 40" fill="none" stroke="#9ee0c6" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  </g>
+  <!-- 鉢 -->
+  <path d="M27 268h96l-12 84H39Z" fill="#c9714f"/>
+  <path d="M27 268h20l-4 84h-4Z" fill="#dd8a67" opacity="0.7"/>
+  <path d="M108 268h15l-12 84h-9Z" fill="#a95a3d" opacity="0.6"/>
+  <rect x="20" y="254" width="110" height="20" rx="5" fill="#d98563"/>
+  <rect x="20" y="254" width="110" height="5" rx="2.5" fill="#eaa182"/>
+  <path d="M52 300l14 10 14-10 14 10" fill="none" stroke="#e9a181" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+</svg>

@@ -1,0 +1,110 @@
+##line.follow	こんばんは。わたしはルゥ。月灯りの部屋に住んでいるの。
+	「へや」と送るか、トークルームのメニューから、わたしの部屋をのぞいてみて。
+	@set	$lv	1
+	@set	$words	"($words ? $words : {}) + {""かぎ"": {""w"": ""かぎ"", ""onclick"": ""about_key""}, ""ほしのうた"": {""w"": ""ほしのうた"", ""f"": ""hoshi-no-uta.png""}, ""■1"": {""w"": ""■■■■"", ""s"": ""■1""}}"
+	@set	$word_count	2
+月明かり	/if	$jar_done
+	月明かり……。ビンの星がくれた、あたたかいことば。
+	/else
+	月明かり……？　まだ、思い出せないの。
+	/end
+こんばんは	@set	$greeted	true
+	/if	"!$words[""こんばんは""]"
+	@set	$words	"($words ? $words : {}) + {""こんばんは"": 1}"
+	@set	$word_count	$word_count + 1
+	/end
+	こんばんは。来てくれて、うれしい。
+月	/if	"!$words[""つき""]"
+	@set	$words	"($words ? $words : {}) + {""つき"": {""w"": ""月"", ""s"": ""つき""}}"
+	@set	$word_count	$word_count + 1
+	/end
+	月……そう、「つき」。思い出した。ことば帳に書いておくね。
+星	/if	"!$words[""ほし""]"
+	@set	$words	"($words ? $words : {}) + {""ほし"": {""w"": ""星"", ""s"": ""ほし""}}"
+	@set	$word_count	$word_count + 1
+	/end
+	星。夜の部屋を、ほんの少しだけ明るくするもの。
+夜	/if	"!$words[""よる""]"
+	@set	$words	"($words ? $words : {}) + {""よる"": {""w"": ""夜"", ""s"": ""よる""}}"
+	@set	$word_count	$word_count + 1
+	/end
+	夜は、ことばがいちばん静かになる時間。
+ランプ	/if	"!$words[""ランプ""]"
+	@set	$words	"($words ? $words : {}) + {""ランプ"": 1}"
+	@set	$word_count	$word_count + 1
+	/end
+	机のランプ。あかりをつけると、少しだけ昔を思い出せる気がするの。
+かぎ	机の引き出しの鍵……かもしれない。
+	今度、いっしょに探してみようね。
+へや	@button	月灯りの部屋をのぞく
+		部屋へ	{liff_room}
+		ことば帳	{liff_room}/words/
+##error_unhandled_action	……？　ことば帳のことばや、思いついたことばで話しかけてみてね。
+##liff.get_status	@set	$_room	"{""base"": {""f"": ""room-base.svg"", ""x"": 0, ""y"": 0, ""w"": 1, ""h"": 1, ""id"": 0}, ""window"": {""f"": ""window.svg"", ""x"": 0.08, ""y"": 0.07, ""w"": 0.34, ""h"": 0.46, ""id"": 1, ""onclick"": ""look_window""}, ""shelf"": {""f"": ""shelf.svg"", ""x"": 0.66, ""y"": 0.08, ""w"": 0.28, ""h"": 0.46, ""id"": 1}, ""rug"": {""f"": ""rug.svg"", ""x"": 0.14, ""y"": 0.74, ""w"": 0.66, ""h"": 0.2, ""id"": 1}, ""desk"": {""f"": ""desk.svg"", ""x"": 0.6, ""y"": 0.47, ""w"": 0.37, ""h"": 0.4, ""id"": 2, ""onclick"": ""touch_lamp""}, ""letter"": {""f"": ""letter.svg"", ""x"": 0.75, ""y"": 0.548, ""w"": 0.1, ""h"": 0.0556, ""id"": 3, ""onclick"": ""open_letter""}, ""plant"": {""f"": ""plant.svg"", ""x"": 0.01, ""y"": 0.49, ""w"": 0.15, ""h"": 0.4, ""id"": 3}, ""jar"": {""f"": $jar_done ? ""jar-glow.svg"" : ""jar.svg"", ""x"": 0.19, ""y"": 0.58, ""w"": 0.12, ""h"": 0.19, ""id"": 4, ""onclick"": ""touch_jar""}, ""ruu"": {""f"": ""ruu.svg"", ""x"": 0.36, ""y"": 0.33, ""w"": 0.27, ""h"": 0.48, ""id"": 5, ""onclick"": ""talk_ruu""}}"
+	@set	$_missions	"[{""id"": 1, ""img1"": ""hello.png"", ""img2"": ""hello.png"", ""cleared"": $greeted ? true : false}, {""id"": 2, ""img1"": ""jar.png"", ""img2"": ""jar.png"", ""cleared"": $jar_done ? true : false}, {""id"": 3, ""img1"": ""letter.png"", ""img2"": ""letter.png"", ""cleared"": $letter_read ? true : false}, {""id"": 4, ""img1"": ""words.png"", ""img2"": ""words.png"", ""cleared"": $word_count >= 5}]"
+	@set	$_menu	"[""missions"", ""words"", ""links"", ""talk""] + ($intro_seen ? [""messages""] : []) + ($jar_done ? [""moon_door""] : [])"
+	@set	$_status	"{""event"": $intro_seen ? {} : {""intro"": 10}, ""lv"": $lv ? $lv : 1, ""n_words"": $word_count ? $word_count : 0, ""menu"": $_menu, ""roomObjects"": $_room, ""words"": $words ? $words : {}, ""missions"": $_missions}"
+	{$_status!j}
+##liff.get_messages	@set	$_messages	"[{""id"": ""welcome"", ""from"": ""ルゥ"", ""title"": ""はじめまして"", ""read"": $read_welcome ? true : false, ""sort"": 30, ""content"": ""welcome""}, {""id"": ""news"", ""from"": ""月見新聞"", ""title"": ""号外：月から「ことば」がこぼれた？"", ""read"": $read_news ? true : false, ""sort"": 20, ""content"": ""news"", ""onopen"": ""read_news""}, {""id"": ""about"", ""from"": ""XStoryLIFF"", ""title"": ""このデモについて"", ""read"": $read_about ? true : false, ""sort"": 10, ""content"": ""about""}]"
+	{$_messages!j}
+##liff.message_content:welcome	<p>はじめまして。ルゥです。</p><p>この部屋には、むかしはたくさんの「ことば」がありました。気がついたら、ほとんどが月の光にとけて、どこかへ行ってしまったの。</p><p>LINEで話しかけてくれたら、ことばを少しずつ思い出せる気がします。よかったら、手伝ってください。</p>
+##liff.message_content:news	"<p style=""color:#ffd99a;font-weight:bold"">月見新聞・号外</p><p>昨夜、町の上空で月の光が糸のようにほどけ、屋根の上に小さな文字が降り積もるのが目撃された。専門家は「ことばの流れ星」と呼んでいる。</p><p><a href=""../documents/clipping/"" style=""color:#9fd3ff;text-decoration:underline"">記事の切り抜きを見る</a></p>"
+##liff.message_content:about	<p>これは <strong>XStoryLIFF</strong> のデモです。XStoryBot のサンプルシナリオで動いています。</p><p>LINEで「こんばんは」「月」などと話しかけると、見つけたことばが、ことば帳に増えていきます。</p>
+##liff.on_message_read:welcome	@set	$read_welcome	true
+##liff.on_message_read:news	@set	$read_news	true
+##liff.on_message_read:about	@set	$read_about	true
+##liff.intro:room	"[[""set"",""ruu"",{{""f"":""ruu-smile.svg"",""x"":0.36,""y"":0.33,""w"":0.27,""h"":0.48,""id"":5,""onclick"":""talk_ruu"",""effect"":""scale""}}]]"
+	……あ、来てくれたんだ。
+	わたしはルゥ。この部屋で、なくした「ことば」を探しているの。
+	"[[""command"",""intro_2""]]"
+##liff.intro_2	@set	$intro_seen	true
+	LINEで話しかけてくれたら、見つけたことばが「ことば帳」に集まるよ。
+	"[[""set"",""messages"",{{""visible"":true}}]]"
+	それと、わたしに届いた「手紙」も、よかったら読んでね。
+##liff.talk_ruu	"[[""set"",""ruu"",{{""f"":""ruu-smile.svg"",""x"":0.36,""y"":0.33,""w"":0.27,""h"":0.48,""id"":5,""onclick"":""talk_ruu""}}]]"
+	なあに？
+	今夜は月がきれいだね。
+	"[[""set"",""ruu"",{{""f"":""ruu.svg"",""x"":0.36,""y"":0.33,""w"":0.27,""h"":0.48,""id"":5,""onclick"":""talk_ruu""}}]]"
+##liff.look_window	窓の外に、大きな月が浮かんでいる。
+	ときどき、光のすじが町へ落ちていくのが見える。
+##liff.touch_lamp	"[[""set"",""desk"",{{""f"":""desk.svg"",""x"":0.6,""y"":0.47,""w"":0.37,""h"":0.4,""id"":2,""onclick"":""touch_lamp"",""effect"":""glow""}}]]"
+	ランプに手をかざすと、ほんのり温かい。
+##liff.about_key	@set	$words	"($words ? $words : {}) + {""かぎ"": {""w"": ""かぎ"", ""f"": ""kagi.png""}}"
+	"[[""set"",""かぎ"",{{""w"":""かぎ"",""f"":""kagi.png""}}]]"
+##liff.open_letter	@set	$letter_read	true
+	机の上の手紙には、何か書いてあるみたい。
+	"[[""go"",""/documents/memo/""]]"
+##liff.read_news	/if	!$news_opened
+	@set	$news_opened	true
+	@set	$lv	2
+	"[[""set_hud"",""lv"",2]]"
+	/end
+##liff.touch_jar	/if	$jar_done
+	ビンの中で、星が静かに光ってる。
+	/else
+	#jar_start
+	/end
+#jar_start	@set	$jar_started	true
+	"[[""set"",""ruu"",{{""f"":""ruu-surprised.svg"",""x"":0.36,""y"":0.33,""w"":0.27,""h"":0.48,""id"":5,""onclick"":""talk_ruu"",""effect"":""shake""}}]]"
+	あっ、ビンの星がこぼれてる！
+	"[[""set"",""star"",{{""f"":""star.svg"",""x"":0.8,""y"":0.85,""w"":0.075,""h"":0.08,""id"":6,""effect"":""scale""}}],[""set"",""ruu"",{{""f"":""ruu.svg"",""x"":0.36,""y"":0.33,""w"":0.27,""h"":0.48,""id"":5,""onclick"":""talk_ruu""}}]]"
+	床の星を、ビンまで運んでくれる？
+	"[[""condition"",""jar_done"",[[""position"",[""star"",0.17,0.6,0.255,0.71]]]]]"
+##liff.jar_done	/if	$jar_started && !$jar_done
+	@set	$jar_done	true
+	/if	"!$words[""つきあかり""]"
+	@set	$words	"($words ? $words : {}) + {""つきあかり"": {""w"": ""月明かり"", ""s"": ""つきあかり""}}"
+	@set	$word_count	$word_count + 1
+	/end
+	"[[""set"",""star"",null],[""set"",""jar"",{{""f"":""jar-glow.svg"",""x"":0.19,""y"":0.58,""w"":0.12,""h"":0.19,""id"":4,""onclick"":""touch_jar"",""effect"":""glow,room_flash""}}],[""set"",""ruu"",{{""f"":""ruu-smile.svg"",""x"":0.36,""y"":0.33,""w"":0.27,""h"":0.48,""id"":5,""onclick"":""talk_ruu""}}]]"
+	ありがとう！　星がもどったよ。
+	お礼に、ひとつことばを思い出したの。……「月明かり」。
+	"[[""set_hud"",""n_words"",{$word_count}],[""set"",""moon_door"",{{""visible"":true}}],[""set"",""ruu"",{{""f"":""ruu.svg"",""x"":0.36,""y"":0.33,""w"":0.27,""h"":0.48,""id"":5,""onclick"":""talk_ruu""}}]]"
+	/end
+##liff.open_moon_door	/if	$jar_done
+	"[[""set"",""ruu"",{{""f"":""ruu-surprised.svg"",""x"":0.36,""y"":0.33,""w"":0.27,""h"":0.48,""id"":5,""onclick"":""talk_ruu"",""effect"":""shake""}}]]"
+	扉のすきまから、月の光がさしこんできた……！
+	"[[""set"",""ruu"",{{""f"":""ruu.svg"",""x"":0.36,""y"":0.33,""w"":0.27,""h"":0.48,""id"":5,""onclick"":""talk_ruu""}}]]"
+	光のなかに、読めない文字が浮かんでいる。
+	"[[""go"",""/documents/memo/?route=broken""]]"
+	/end

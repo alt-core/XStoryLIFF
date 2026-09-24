@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 370 360">
+  <defs>
+    <radialGradient id="glow" cx="104" cy="96" r="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd48f" stop-opacity="0.55"/>
+      <stop offset="0.4" stop-color="#ffc06a" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#ffc06a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a86f53"/>
+      <stop offset="1" stop-color="#875640"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe6b5"/>
+      <stop offset="1" stop-color="#ffc56f"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="104" cy="96" r="150" fill="url(#glow)"/>
+
+  <!-- 脚（奥） -->
+  <rect x="44" y="136" width="14" height="200" fill="#5a3a30"/>
+  <rect x="312" y="136" width="14" height="200" fill="#5a3a30"/>
+  <!-- 天板 -->
+  <rect x="8" y="118" width="354" height="22" rx="4" fill="url(#top)"/>
+  <rect x="8" y="118" width="354" height="5" rx="2.5" fill="#c38a6b"/>
+  <rect x="8" y="136" width="354" height="6" fill="#6e4535"/>
+  <!-- 引き出し -->
+  <rect x="214" y="142" width="136" height="58" rx="3" fill="#7d4f3d"/>
+  <rect x="222" y="150" width="120" height="42" rx="3" fill="#8a5a45"/>
+  <rect x="266" y="166" width="32" height="7" rx="3.5" fill="#e7c98f"/>
+  <!-- 脚（手前） -->
+  <rect x="20" y="140" width="20" height="216" rx="3" fill="#7d4f3d"/>
+  <rect x="20" y="140" width="6" height="216" fill="#94634d"/>
+  <rect x="328" y="200" width="20" height="156" rx="3" fill="#7d4f3d"/>
+  <rect x="328" y="200" width="6" height="156" fill="#94634d"/>
+
+  <!-- ランプ -->
+  <ellipse cx="70" cy="118" rx="32" ry="7" fill="#b98845"/>
+  <rect x="44" y="108" width="52" height="10" rx="4" fill="#d9a95a"/>
+  <path d="M70 108L86 64" stroke="#d9a95a" stroke-width="7" stroke-linecap="round"/>
+  <path d="M86 64L112 40" stroke="#d9a95a" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="86" cy="64" r="6" fill="#b98845"/>
+  <path d="M96 14l52 10-12 44-58-16Z" fill="url(#shade)"/>
+  <path d="M78 52l58 16" stroke="#e7a64f" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="107" cy="60" rx="18" ry="7" fill="#fff4d2" transform="rotate(16 107 60)"/>
+
+  <!-- マグ -->
+  <rect x="244" y="92" width="24" height="26" rx="5" fill="#b9aee0"/>
+  <path d="M268 98q10 1 9 9t-9 8" fill="none" stroke="#b9aee0" stroke-width="4"/>
+  <rect x="244" y="100" width="24" height="4" fill="#8d86df"/>
+  <path d="M252 86q-5-7 1-13t0-12M261 86q-5-7 1-13" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- 本の山 -->
+  <rect x="282" y="104" width="70" height="14" rx="2" fill="#7fb6a7"/>
+  <rect x="288" y="90" width="60" height="14" rx="2" fill="#e2a55a"/>
+  <rect x="284" y="76" width="64" height="14" rx="2" fill="#c97a7d"/>
+  <rect x="284" y="80" width="64" height="3" fill="#ffd9d9" opacity="0.5"/>
+  <rect x="288" y="94" width="60" height="3" fill="#fff0cf" opacity="0.5"/>
+</svg>

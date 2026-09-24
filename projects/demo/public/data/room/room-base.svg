@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 900">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#241f55"/>
+      <stop offset="1" stop-color="#342b6b"/>
+    </linearGradient>
+    <pattern id="wallpaper" width="84" height="84" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="42" height="84" fill="#ffffff" opacity="0.022"/>
+      <path d="M63 20l2.2 5.6 5.6 2.2-5.6 2.2L63 35.6l-2.2-5.6-5.6-2.2 5.6-2.2z" fill="#ffd89a" opacity="0.13"/>
+      <circle cx="21" cy="62" r="1.6" fill="#ffd89a" opacity="0.12"/>
+    </pattern>
+    <linearGradient id="wainscot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2c2455"/>
+      <stop offset="1" stop-color="#241d47"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a2f3f"/>
+      <stop offset="0.45" stop-color="#5d3a3c"/>
+      <stop offset="1" stop-color="#6d4538"/>
+    </linearGradient>
+    <linearGradient id="floorShadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#140f2a" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#140f2a" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="lampLight" cx="790" cy="470" r="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffcf87" stop-opacity="0.3"/>
+      <stop offset="0.5" stop-color="#ffb866" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#ffb866" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonLight" cx="260" cy="250" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c3bcff" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#c3bcff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="windowSpill" cx="250" cy="760" r="260" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d6d0ff" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#d6d0ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vignette" cx="500" cy="430" r="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0.55" stop-color="#0b0820" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0b0820" stop-opacity="0.55"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1000" height="650" fill="url(#wall)"/>
+  <rect width="1000" height="650" fill="url(#wallpaper)"/>
+
+  <!-- 腰壁 -->
+  <rect y="486" width="1000" height="150" fill="url(#wainscot)"/>
+  <rect y="480" width="1000" height="10" fill="#463c7a"/>
+  <rect y="480" width="1000" height="3" fill="#6a5fa6" opacity="0.7"/>
+  <g fill="none" stroke="#3a3169" stroke-width="3" opacity="0.9">
+    <rect x="20" y="508" width="220" height="104" rx="6"/>
+    <rect x="270" y="508" width="220" height="104" rx="6"/>
+    <rect x="520" y="508" width="220" height="104" rx="6"/>
+    <rect x="770" y="508" width="210" height="104" rx="6"/>
+  </g>
+
+  <!-- 幅木 -->
+  <rect y="630" width="1000" height="22" fill="#1f1839"/>
+  <rect y="630" width="1000" height="3" fill="#3e3470"/>
+
+  <!-- 床 -->
+  <rect y="652" width="1000" height="248" fill="url(#floor)"/>
+  <g fill="#ffffff" opacity="0.035">
+    <rect y="672" width="1000" height="22"/>
+    <rect y="722" width="1000" height="32"/>
+    <rect y="796" width="1000" height="44"/>
+  </g>
+  <g stroke="#351f2e" stroke-width="3" opacity="0.55">
+    <line x1="0" y1="672" x2="1000" y2="672"/>
+    <line x1="0" y1="694" x2="1000" y2="694"/>
+    <line x1="0" y1="722" x2="1000" y2="722"/>
+    <line x1="0" y1="754" x2="1000" y2="754"/>
+    <line x1="0" y1="796" x2="1000" y2="796"/>
+    <line x1="0" y1="840" x2="1000" y2="840"/>
+    <line x1="0" y1="892" x2="1000" y2="892"/>
+  </g>
+  <g stroke="#351f2e" stroke-width="3" opacity="0.45">
+    <line x1="130" y1="652" x2="130" y2="672"/><line x1="410" y1="652" x2="410" y2="672"/><line x1="660" y1="652" x2="660" y2="672"/><line x1="900" y1="652" x2="900" y2="672"/>
+    <line x1="60" y1="672" x2="60" y2="694"/><line x1="300" y1="672" x2="300" y2="694"/><line x1="560" y1="672" x2="560" y2="694"/><line x1="790" y1="672" x2="790" y2="694"/>
+    <line x1="190" y1="694" x2="190" y2="722"/><line x1="450" y1="694" x2="450" y2="722"/><line x1="720" y1="694" x2="720" y2="722"/><line x1="950" y1="694" x2="950" y2="722"/>
+    <line x1="90" y1="722" x2="90" y2="754"/><line x1="350" y1="722" x2="350" y2="754"/><line x1="600" y1="722" x2="600" y2="754"/><line x1="840" y1="722" x2="840" y2="754"/>
+    <line x1="230" y1="754" x2="230" y2="796"/><line x1="490" y1="754" x2="490" y2="796"/><line x1="740" y1="754" x2="740" y2="796"/>
+    <line x1="140" y1="796" x2="140" y2="840"/><line x1="410" y1="796" x2="410" y2="840"/><line x1="670" y1="796" x2="670" y2="840"/><line x1="920" y1="796" x2="920" y2="840"/>
+    <line x1="40" y1="840" x2="40" y2="892"/><line x1="300" y1="840" x2="300" y2="892"/><line x1="560" y1="840" x2="560" y2="892"/><line x1="820" y1="840" x2="820" y2="892"/>
+  </g>
+  <rect y="652" width="1000" height="60" fill="url(#floorShadow)"/>
+
+  <!-- 光 -->
+  <rect width="1000" height="900" fill="url(#moonLight)"/>
+  <rect width="1000" height="900" fill="url(#windowSpill)"/>
+  <rect width="1000" height="900" fill="url(#lampLight)"/>
+  <rect width="1000" height="900" fill="url(#vignette)"/>
+</svg>
