@@ -12,7 +12,7 @@ let loaded: { scenario: MockScenario<unknown>; state: unknown; storageKey: strin
 async function load() {
   if (loaded) return loaded;
   const [entry] = Object.entries(scenarios);
-  if (!entry) throw new Error("この作品にはモック（projects/<名前>/mock.ts）がありません。LINEとBotにつないで確かめてください");
+  if (!entry) throw new Error("この作品にはモック（projects/<名前>/mock.ts）がありません。LINEかWebchatでBotにつないで確かめてください");
   const [path, importScenario] = entry;
   const { default: scenario } = await importScenario();
   // 作品ごとに分けて保存する（作品を切り替えた時に、別の作品の状態を読まない）

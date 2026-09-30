@@ -33,7 +33,7 @@ python tools/local_scenario.py verify --settings settings.yaml --bot bot \
 
 XStoryBotの手元のWebchatで、トークと部屋（XStoryLIFF）を一緒に動かせます。LINEは要りません。
 
-1. `settings.yaml` の `plugins` に `liff` を足し、`bots.bot` の `interfaces` を次のようにします。会話のBot自身を、LIFFの連携先（`liff_apps`）にします。`YOUR_LIFF_ID` は、上の `liff_room` と同じ値にします。
+1. `settings.yaml` の `plugins` に `liff` を足し、`bots.bot` の `interfaces` を次のようにします。会話のBot自身を、LIFFの連携先（`liff_apps`）にします。`YOUR_LIFF_ID` は、上の `liff_room` と同じ値にします。LINEを使わない作品では、`liff_id` を書かず、`liff_room` に `http://127.0.0.1:5173` を書きます（[LINEを使わない場合](../../../docs/xstoryliff/deployment.md#lineを使わない場合)）。
 
    ```yaml
      plugins:

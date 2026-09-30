@@ -1,4 +1,4 @@
-# 型検査・単体テスト・LINEなしで動くビルドを確かめる（使う作品は .env の XSTORYLIFF_PROJECT。無ければデモ）
+# 型検査・単体テスト・LINEなしで動くビルドを確かめ、Webchat だけのビルドに LINE の SDK が入らないことも確かめる（使う作品は .env の XSTORYLIFF_PROJECT。無ければデモ）
 name: CI
 
 on:
@@ -21,3 +21,12 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run build:mock
+      # LINE の SDK は、LIFF ID のあるビルドにだけ入る。入るはずのビルドでも見て、manifest の読み方が古くなっていないことを確かめる。
+      # Webchat だけのビルドは、作品の .env などに LINE の値があっても空で上書きする
+      - name: LINE の SDK は Webchat だけのビルドに入らない
+        run: |
+          VITE_LIFF_ID=1234567890-example VITE_API_BASE_URL=https://bot.example.com VITE_BOT=story npm run build -- --manifest
+          grep -q '@line/liff' dist/.vite/manifest.json
+          VITE_LIFF_ID= VITE_API_BASE_URL= VITE_BOT= VITE_WEBCHAT_ORIGIN=https://chat.example.com npm run build -- --manifest
+          test -f dist/.vite/manifest.json
+          if grep -q '@line/liff' dist/.vite/manifest.json; then echo "Webchat だけのビルドに LINE の SDK が入っています"; exit 1; fi

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 type Api = typeof import("../src/lib/api.ts");
 let api: Api;
@@ -61,6 +61,39 @@ describe("起動方法", () => {
     expect(launchMode("?xsb_client=line")).toBe("line");
     expect(launchMode("?id=1&xsb_client=webchat")).toBe("webchat");
     expect(() => launchMode("?xsb_client=other")).toThrow("起動方法");
+  });
+
+  /** LINE の SDK の代わり。モジュールはテストごとに読み直すので、SDK を読んだかをテストごとに確かめられる */
+  function mockLiffSdk() {
+    const sdk = { loaded: false, init: vi.fn(async () => {}), isInClient: () => true, isLoggedIn: () => false, login: vi.fn() };
+    vi.doMock("@line/liff", () => {
+      sdk.loaded = true;
+      return { default: sdk };
+    });
+    window.history.replaceState(null, "", "/");
+    return sdk;
+  }
+  afterEach(() => {
+    vi.doUnmock("@line/liff");
+    vi.unstubAllEnvs();
+  });
+
+  it("LINE では、LINE の SDK で初期化し、未ログインならログインへ進む", async () => {
+    const sdk = mockLiffSdk();
+    vi.stubEnv("VITE_LIFF_ID", "1234567890-abcdefgh");
+    const { connectBot } = await import("../src/lib/liff.ts");
+    expect(await connectBot()).toBeNull();
+    expect(sdk.loaded).toBe(true);
+    expect(sdk.init).toHaveBeenCalledWith({ liffId: "1234567890-abcdefgh" });
+    expect(sdk.login).toHaveBeenCalledWith({ redirectUri: window.location.href });
+  });
+
+  it("LIFF ID の無いビルド（Webchat だけで使う）を LINE として開くと、LINE の SDK を読まずに止める", async () => {
+    const sdk = mockLiffSdk();
+    vi.stubEnv("VITE_LIFF_ID", "");
+    const { connectBot } = await import("../src/lib/liff.ts");
+    await expect(connectBot()).rejects.toThrow("Webchat の中から開いてください");
+    expect(sdk.loaded).toBe(false);
   });
 
   it("webchat で開いている時は、アプリの中のページへのリンクに起動パラメータを引き継ぐ", async () => {

@@ -7,7 +7,7 @@ XStoryLIFFは、以下の外部ソフトウェアと書体を利用していま�
 | パッケージ | 用途 | ライセンス |
 |---|---|---|
 | `svelte` | 画面の構築 | MIT |
-| `@line/liff` | LINEのLIFF SDK | [LINE Developers Agreement](https://terms2.line.me/LINE_Developers_Agreement)に従って利用（パッケージのREADMEを参照） |
+| `@line/liff` | LINEのLIFF SDK（LIFF IDを設定したビルドにだけ入る） | [LINE Developers Agreement](https://terms2.line.me/LINE_Developers_Agreement)に従って利用（パッケージのREADMEを参照） |
 
 ## 開発時依存
 

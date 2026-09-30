@@ -15,7 +15,7 @@ LINEのトークで進む物語に、キャラクターの住む「部屋」や�
 - **リンク集**: イベントの間だけ、バナーを差し替えられます
 - **資料**: 作中の資料の画像を表示します。グリッチの演出を2段階の強さで重ねられ、URLで切り替えられます
 - **作品固有のページ**: 謎解きの画面などをSvelteで足せます。台詞の吹き出しを置けば、そのページでも台詞を出せます
-- **LINEとXStoryBotのWebchat**: 同じ画面とシナリオを、LINEのLIFFでも、XStoryBotのWebchat（チャットの中のiframe）でも使えます
+- **LINEとXStoryBotのWebchat**: 同じ画面とシナリオを、LINEのLIFFでも、XStoryBotのWebchat（チャットの中のiframe）でも使えます。LINEを使わず、Webchatだけでも使えます（LINEのSDKを含まないビルドになります）
 - **作品ごとのフォルダ**: 作品の設定・画像・ページ・モックを `projects/<名前>/` にまとめます。デモとは別のフォルダなので、フォークしてエンジンの更新を取り込みやすくなっています
 
 ![ことば帳・ミッション・手紙・リンク集](images/pages.jpg)
@@ -53,7 +53,7 @@ npm run dev:mock
 4. シナリオに `##liff.get_status` などを書きます。[サンプルシナリオ](../../projects/demo/xstorybot/)は、デモと同じ動きをXStoryBotで再現します。
 5. `npm run build` で `dist/` を作り、静的ホストへ置きます。
 
-手順の詳細は[公開手順](deployment.md)にあります。XStoryBotのWebchatでも使う時は、[公開手順の「XStoryBotのWebchatで使う」](deployment.md#xstorybotのwebchatで使う)を参照してください。
+手順の詳細は[公開手順](deployment.md)にあります。XStoryBotのWebchatでも使う時は、[公開手順の「XStoryBotのWebchatで使う」](deployment.md#xstorybotのwebchatで使う)を、LINEを使わずWebchatだけで使う時は、[「LINEを使わない場合」](deployment.md#lineを使わない場合)を参照してください。
 
 ## 自分の作品を作る
 

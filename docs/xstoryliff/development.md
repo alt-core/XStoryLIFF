@@ -82,6 +82,8 @@ XStoryBotの手元のWebchat（`tools/local_scenario.py webchat`）の中で、�
 3. XStoryLIFFで、`VITE_WEBCHAT_ORIGIN=http://127.0.0.1:8765 npm run dev` を実行します。
 4. `http://127.0.0.1:8765/chat/bot` を開き、シナリオのボタンなどから `https://liff.line.me/YOUR_LIFF_ID` のリンクを押すと、チャットの中に画面が開きます（[サンプルシナリオ](../../projects/demo/xstorybot/README.md)では「へや」）。
 
+LINEを使わない作品では、`liff_id` を書かず、シナリオのリンクに登録したURLの配下（`http://127.0.0.1:5173/words/` など）をそのまま書きます（[LINEを使わない場合](deployment.md#lineを使わない場合)）。
+
 ## テストと検査
 
 ```sh
@@ -90,12 +92,12 @@ npm run check       # 型検査（svelte-check と tsc）
 npm run build:mock  # モックで動くビルド
 ```
 
-エンジンの単体テストは `tests/` に、作品のテストは作品のフォルダ（`projects/<名前>/*.test.ts`）にあります。プッシュすると、GitHub Actions（`.github/workflows/ci.yml`）が型検査・単体テスト・モックのビルドを確かめます。
+エンジンの単体テストは `tests/` に、作品のテストは作品のフォルダ（`projects/<名前>/*.test.ts`）にあります。プッシュすると、GitHub Actions（`.github/workflows/ci.yml`）が型検査・単体テスト・モックのビルドを確かめ、WebchatだけのビルドにLINEのSDKが入らないことも確かめます。
 
 | ファイル | 内容 |
 |---|---|
 | `eventEngine.test.ts` | 台本の進み方、読み込み中の実行、不具合の時に止める動き |
-| `api.test.ts` | Botへの送信（送る順に1つずつ）、起動方法（LINEとWebchat）、アプリの中のリンク |
+| `api.test.ts` | Botへの送信（送る順に1つずつ）、起動方法（LINEとWebchat。LIFF IDの無いビルドではLINEのSDKを読まない）、アプリの中のリンク |
 | `xstorybot.test.ts` | XStoryBotの取り決め（LINEのLIFF APIへの送信と失敗の分け方、Webchatの画面とのやり取り、送り元の確かめ、起動パラメータの引き継ぎ） |
 | `userStatus.test.ts` | 利用者の状態（`get_status`）の形の確かめ方 |
 | `words.test.ts` | ことば帳の見出しと並べ方 |

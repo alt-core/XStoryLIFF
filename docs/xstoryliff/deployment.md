@@ -1,5 +1,7 @@
 # 公開手順
 
+LINEを使わず、XStoryBotのWebchatだけで使う場合は、[LINEを使わない場合](#lineを使わない場合)を先に読んでください。
+
 ## 1. LINE DevelopersでLIFFアプリを作る
 
 LIFFアプリは、XStoryBotが使うMessaging APIチャネルと**同じプロバイダー**のLINEログインチャネルに作ります。LINEのユーザーIDはプロバイダーごとに異なるため、プロバイダーが違うと、トークとLIFFが別の利用者として扱われ、フラグを共有できません。
@@ -20,7 +22,7 @@ XStoryBotの設定で、`liff` pluginとBotのinterfaceを有効にします。
 plugins:
   liff:
     allow_origin: "https://liff.example.com"   # 画面を置くorigin。pathは含めない。複数なら配列で書く
-    login_channel_id: "1234567890"             # LIFFアプリを作ったLINEログインチャネルのID（必須）
+    login_channel_id: "1234567890"             # LIFFアプリを作ったLINEログインチャネルのID（LINEで使う時は必須）
     ignore_unhandled_action: true              # シナリオに無いLIFFのactionは、空の応答にする
 
 bots:
@@ -47,13 +49,13 @@ bots:
 | `VITE_API_BASE_URL` | XStoryBotのAPIの基点（`https://<Botのホスト>`）。LIFF APIは `<基点>/liff/<Bot名>/message` |
 | `VITE_BOT` | XStoryBotのBot名（上の `story` など） |
 | `VITE_FORWARD_URL` | 任意。LINEアプリの外で開かれた時の転送先（友だち追加のページなど）。書かなければ、LINEログインして表示する |
-| `VITE_WEBCHAT_ORIGIN` | XStoryBotのWebchatでも使う時に、Webchatの画面のorigin（[下の節](#xstorybotのwebchatで使う)） |
+| `VITE_WEBCHAT_ORIGIN` | XStoryBotのWebchatで使う時に、Webchatの画面のorigin（[下の節](#xstorybotのwebchatで使う)） |
 
 ```sh
 npm run build
 ```
 
-LINEの3つ（`VITE_LIFF_ID`・`VITE_API_BASE_URL`・`VITE_BOT`）がそろっていない時は、ビルドを止めます。Webchatだけで使う場合は、`VITE_WEBCHAT_ORIGIN` だけでかまいません。LINEとWebchatの両方を書けば、1つのビルドを両方で使えます。
+LINEの3つ（`VITE_LIFF_ID`・`VITE_API_BASE_URL`・`VITE_BOT`）がそろっていない時は、ビルドを止めます。Webchatだけで使う場合は、`VITE_WEBCHAT_ORIGIN` だけでかまいません（LINEのSDKは出力に入りません。[LINEを使わない場合](#lineを使わない場合)）。LINEとWebchatの両方を書けば、1つのビルドを両方で使えます。
 
 サブパスへ置く場合は、配置先のpathを指定します。設定やBotの応答の `/` で始まるpathは、このpathからのpathになります。
 
@@ -114,6 +116,16 @@ Webchatでの違い:
 - ページを移る時（メニュー、戻るボタン、`go`、リンク集、手紙の本文のリンク）は、`xsb_client=webchat` を引き継ぎます。作品固有のページでアプリの中へリンクする時は、`pageHref()`（`src/lib/project.ts`）を使います。
 - トークへの送信（メニューの `send`、ことばのタップ、`send_chat`）は、Webchatのチャットへの発言になります。LIFFを閉じる操作は、ページの表示を閉じます。
 - 外部のリンク（リンク集の `isExternal` など）は、新しいタブで開きます。`go` で外部のURLへ移ると、iframeの中で開くので、埋め込みを拒むサイトは表示されません。
+
+### LINEを使わない場合
+
+Webchatだけで使う作品では、LINEの設定は要りません。
+
+- LINE DevelopersのLIFFアプリ（1）は作りません。XStoryBotの設定では、`login_channel_id`、Botの `line` interface、`liff_apps` の `liff_id` は要りません。
+- Botのinterfaceは、`webchat`（`liff_apps` を置く）と `liff` の2つにします。`liff` pluginの `allow_origin` は、XStoryBotが必須とするので、画面を置くoriginを書きます。
+- シナリオのリンクには、XStoryLIFFを置いたURL（`https://liff.example.com/words/` など）をそのまま書きます。`match: prefix` なら、配下のページもWebchatの中で開きます。
+- `VITE_WEBCHAT_ORIGIN` だけを書いてビルドします。LINEのSDKは出力に入らないので、LINEと通信するコードを配りません。
+- `xsb_client=webchat` を付けずにページを直接開くと、LINEのSDKを読まずに、Webchatの中から開くよう知らせるエラーの画面になります。
 
 ## LINEなしのデモを公開する
 

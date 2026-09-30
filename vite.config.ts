@@ -75,7 +75,7 @@ export default defineConfig(async ({ mode, command }) => {
     const missing = line.filter((name) => !env[name]);
     if (missing.length > 0 && (missing.length < line.length || !env.VITE_WEBCHAT_ORIGIN)) {
       throw new Error(
-        `${missing.join("・")} を設定してください（.env.production.local など）。webchat だけで使う場合は VITE_WEBCHAT_ORIGIN だけでかまいません。LINEなしで確かめる場合は npm run build:mock を使います。`
+        `${missing.join("・")} を設定してください（.env.production.local など）。Webchat だけで使う場合は VITE_WEBCHAT_ORIGIN だけでかまいません。LINEなしで確かめる場合は npm run build:mock を使います。`
       );
     }
   }

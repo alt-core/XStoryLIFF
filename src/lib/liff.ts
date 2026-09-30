@@ -13,7 +13,8 @@ export function launchMode(search: string = window.location.search): "line" | "w
 
 /**
  * Bot との接続を用意する。
- * - LINE: LIFF を初期化する。LINEアプリの外で開かれて転送先があれば転送し、未ログインならログインへ進む（どちらも null を返す）
+ * - LINE: LIFF を初期化する。LINEアプリの外で開かれて転送先があれば転送し、未ログインならログインへ進む（どちらも null を返す）。
+ *   LIFF ID の無いビルド（Webchat だけで使う）では、LINE の SDK を読まずに止める
  * - webchat: 親の画面（XStoryBot の Webchat）と接続する。LINE の SDK は読み込まない
  * - モック（npm run dev:mock）: LINE と Bot の代わり
  */
@@ -24,12 +25,16 @@ export async function connectBot(): Promise<BotClient | null> {
   }
   if (launchMode() === "webchat") {
     const parentOrigin = import.meta.env.VITE_WEBCHAT_ORIGIN;
-    if (!parentOrigin) throw new Error("webchat の画面のオリジン（VITE_WEBCHAT_ORIGIN）が設定されていません");
+    if (!parentOrigin) throw new Error("Webchat の画面のオリジン（VITE_WEBCHAT_ORIGIN）が設定されていません");
     return connectWebchat({ parentOrigin });
   }
 
+  // LIFF ID の無いビルド（Webchat だけで使う）は、LINE の SDK を読まない。値はビルドの時に埋め込まれ、この throw より後ろの import は
+  // 出力から消えるので、SDK は出力にも入らない（判定の形を変えると SDK が出力に戻ることがあるので、CI で確かめている）
+  const liffId = import.meta.env.VITE_LIFF_ID;
+  if (!liffId) throw new Error("この画面は Webchat の中から開いてください（VITE_LIFF_ID の無い、Webchat だけのビルドです）");
   const { default: liff } = await import("@line/liff");
-  await liff.init({ liffId: import.meta.env.VITE_LIFF_ID ?? "" });
+  await liff.init({ liffId });
 
   // LINEアプリ内で開かれていない場合の処理
   if (!liff.isInClient() && import.meta.env.VITE_FORWARD_URL) {
