@@ -1,7 +1,7 @@
 /*
   XStoryBot との接続。XStoryBot の LIFF 連携仕様（XStoryBot の docs/liff-webchat-api.md）のうち、ページ側を実装する。
   XStoryBot はページ側の実装を持たないので、仕様が変わった時（とくに protocol の version が上がった時）は、ここを合わせる。
-  - LINE: LIFF のアクセストークンを付けて、XStoryBot の LIFF API（<apiBaseUrl>/liff/<bot>/message）へ POST する
+  - LINE: LIFF のIDトークンを付けて、XStoryBot の LIFF API（<apiBaseUrl>/liff/<bot>/message）へ POST する
   - Webchat: 親の画面（XStoryBot の Webchat）と postMessage でやり取りする（protocol xstorybot-liff、version 1）
   どちらも、同時に1つの操作しか受け付けない（重ねると busy）。待つ時間の上限を過ぎると outcome-unknown にする。
 */
@@ -55,7 +55,7 @@ export interface BotClient {
 
 /** LINE の LIFF SDK のうち、使う操作（liff.init を済ませたもの） */
 export interface LiffSdk {
-  getAccessToken(): string | null;
+  getIDToken(): string | null;
   sendMessages(messages: Array<{ type: "text"; text: string }>): Promise<void>;
   closeWindow(): void;
 }
@@ -124,13 +124,31 @@ export function createLineClient(options: { liff: LiffSdk; apiBaseUrl: string; b
   }
   const endpoint = `${base.href.replace(/\/+$/u, "")}/liff/${encodeURIComponent(bot)}/message`;
   const { run, close } = singleFlight(timeoutMs);
+  const failAuthentication = (signal: AbortSignal) => {
+    // 時間切れになった古い操作の返事で、新しい操作や画面を閉じない。
+    if (!signal.aborted) {
+      close();
+      try {
+        liff.closeWindow();
+      } catch {
+        // 閉じられなくても、元の認証失敗を返し、以後の操作を受け付けない。
+      }
+    }
+    return new BotClientError("unavailable", { message: "LINEの認証情報を取得できません。画面を開き直してください。" });
+  };
 
   return {
     request(action) {
       return run(async (signal) => {
         requireString(action);
-        const token = liff.getAccessToken();
-        if (!token) throw new BotClientError("unavailable");
+        let token: string | null;
+        try {
+          token = liff.getIDToken();
+        } catch {
+          throw failAuthentication(signal);
+        }
+        if (!token) throw failAuthentication(signal);
+        // 認証情報を含む可能性のある通信・応答の例外は、画面やログへ渡さない。
         let response: Response;
         let data: { result?: unknown; message?: unknown } | null;
         try {
@@ -141,14 +159,15 @@ export function createLineClient(options: { liff: LiffSdk; apiBaseUrl: string; b
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
             body: JSON.stringify({ action })
           });
-        } catch (error) {
-          throw new BotClientError("outcome-unknown", { cause: error });
+        } catch {
+          throw new BotClientError("outcome-unknown");
         }
-        if (!response.ok) throw new BotClientError(response.status === 401 || response.status === 403 ? "unavailable" : "request-failed");
+        if (response.status === 401) throw failAuthentication(signal);
+        if (!response.ok) throw new BotClientError(response.status === 403 ? "unavailable" : "request-failed");
         try {
           data = await response.json();
-        } catch (error) {
-          throw new BotClientError("outcome-unknown", { cause: error });
+        } catch {
+          throw new BotClientError("outcome-unknown");
         }
         // Bot が失敗と答えた時と、成功の形でない時（処理済みかもしれない）を分ける
         if (data?.result === "Failure" || data?.result === "Error") throw new BotClientError("request-failed");
@@ -156,17 +175,23 @@ export function createLineClient(options: { liff: LiffSdk; apiBaseUrl: string; b
         try {
           if (data?.result !== "Success" || typeof data.message !== "string") throw new Error("成功の形ではありません");
           lines = JSON.parse(data.message);
-        } catch (error) {
-          throw new BotClientError("outcome-unknown", { cause: error });
+        } catch {
+          throw new BotClientError("outcome-unknown");
         }
         if (!Array.isArray(lines)) throw new BotClientError("outcome-unknown");
         return lines;
       });
     },
     sendText(text) {
-      return run(async () => {
+      return run(async (signal) => {
         requireString(text);
-        await liff.sendMessages([{ type: "text", text }]);
+        try {
+          await liff.sendMessages([{ type: "text", text }]);
+        } catch (error) {
+          const { code, status } = (error ?? {}) as { code?: unknown; status?: unknown };
+          if (code === "UNAUTHORIZED" || code === "401" || code === 401 || status === 401) throw failAuthentication(signal);
+          throw error;
+        }
       });
     },
     close() {

@@ -8,20 +8,30 @@ XStoryLIFFとBot（XStoryBot）のやり取りをまとめます。Bot側では�
 
 | 開き方 | 見分け方 | 送り先 |
 |---|---|---|
-| LINE（LIFF） | URLに `xsb_client` が無い | `<VITE_API_BASE_URL>/liff/<VITE_BOT>/message` へ、LIFFのアクセストークンを付けてPOST |
+| LINE（LIFF） | URLに `xsb_client` が無い | `<VITE_API_BASE_URL>/liff/<VITE_BOT>/message` へ、LIFFのIDトークンを付けてPOST |
 | XStoryBotのWebchat | URLに `xsb_client=webchat`（Webchatがページをiframeで開く時に付ける） | Webchatの画面（親）へ `postMessage` で送り、親がBotを実行する（protocol `xstorybot-liff`、version 1） |
 
 LINEでは、次の形で送ります。
 
 ```http
 POST /liff/story/message
-Authorization: Bearer <LIFFのアクセストークン>
+Authorization: Bearer <LIFFのIDトークン>
 Content-Type: application/json
 
 {"action": "get_status"}
 ```
 
-XStoryBotは、アクセストークンからLINEのユーザーIDを確かめ、actionの先頭に `##liff.` を付けて、シナリオの条件として実行します。トークと同じ利用者として扱うので、フラグを共有できます。Webchatでは、会話のBot自身をLIFFの連携先にすると、同じように会話とフラグを共有できます（[公開手順](deployment.md#xstorybotのwebchatで使う)）。
+XStoryBotは、IDトークンの署名・発行者・発行先・有効期限を確かめ、`sub` をLINEのユーザーIDとして使い、actionの先頭に `##liff.` を付けて、シナリオの条件として実行します。トークと同じ利用者として扱うので、フラグを共有できます。Webchatでは、会話のBot自身をLIFFの連携先にすると、同じように会話とフラグを共有できます（[公開手順](deployment.md#xstorybotのwebchatで使う)）。
+
+本人識別に必要なscopeは `openid` です。表示名やプロフィール画像を取得する `profile` は不要です。トークへ送る `sendText` を使う場合は、別途 `chat_message.write` が必要です。
+
+要求ごとに `liff.getIDToken()` で取得して送ります。SDKが保持している同じトークンを返すことは正常で、画面側ではトークンの更新や期限延長を行いません。XStoryBotは通常、IDトークンの `exp` に従って期限切れを拒否します。標準設定でも、下記の長時間利用の設定でも、トークンの失効・同意取消のオンライン照会は行いません。
+
+IDトークンを取得できない時やBotが401を返した時は、LIFFを閉じて接続を終了します。開き直すと、LIFFの初期化で認証情報を取得します。`sendText` でも、SDKが `UNAUTHORIZED` または401で認証失敗を返した時は同じ扱いです。閉じる操作がLINEの外のブラウザーなどで使えなくても、接続を終了して開き直すよう案内します。
+
+403などの設定・権限の拒否、Botの処理失敗、通信障害、結果不明、時間切れでは、自動で閉じません。失敗した操作を自動で送り直すこともありません。
+
+ページを長時間開いたまま使う場合だけ、XStoryBotで `plugins.liff.id_token_max_age_seconds: 86400` を明示できます。この場合は `exp` に代えて、発行時刻 `iat` から1日まで受け付けます（秒数は正の有限値で変更可）。操作しても期限は延長しません。LINE SDKやAPIの有効期限を延ばす設定ではありません。
 
 XStoryBotの取り決めでは、同時に1つの操作しか受け付けません（重ねると `busy`）。画面は、Botへの送信を送る順に1つずつ送ります。
 
@@ -161,7 +171,7 @@ LINEの窓口を持つBotでは、1回の応答は5行までです（ビルド�
 
 ## 8. 安全に使うために
 
-- LIFFのactionは、利用者が自分で送ることもできます（LINEではアクセストークンを使って直接、Webchatでは自分のブラウザーから）。謎を解いた時のactionなどは、シナリオ側で前提のフラグを確かめてから受け付けてください（[サンプル](../../projects/demo/xstorybot/)の `jar_done` を参照）。
+- LIFFのactionは、利用者が自分で送ることもできます（LINEではIDトークンを使って直接、Webchatでは自分のブラウザーから）。謎を解いた時のactionなどは、シナリオ側で前提のフラグを確かめてから受け付けてください（[サンプル](../../projects/demo/xstorybot/)の `jar_done` を参照）。
 - 画面へ送ったデータは、利用者が読めます。まだ見せたくない語や画像の名前は送らないでください。
 - 作品の `public/` に置いた画像は、名前を知っていれば誰でも開けます。物語の先の画像を先に置いても、秘密にはなりません。
 - 画面は、Botへの送信を1つずつ、送る順に送ります（既読にしてから `onopen` を送る、など）。利用者の操作（物のタップなど）から送るactionは、台本の実行中と前の操作の応答を待つ間は受け付けません。

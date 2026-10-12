@@ -47,7 +47,7 @@ npm run dev:mock
 
 ## LINEとXStoryBotにつなぐ
 
-1. LINE DevelopersでLIFFアプリを作ります。Botと同じプロバイダーのLINEログインチャネルに作り、サイズは `Full`、scopeは `profile` と `chat_message.write` にします。
+1. LINE DevelopersでLIFFアプリを作ります。Botと同じプロバイダーのLINEログインチャネルに作り、サイズは `Full`、scopeは `openid`（本人識別）と、トークへ送る場合の `chat_message.write` にします。`profile` は不要です。
 2. XStoryBotの設定で、Botの `interfaces` に `liff` を加えます。`plugins.liff` には、この画面を置くorigin（`allow_origin`）と、LIFFアプリを作ったLINEログインチャネルのID（`login_channel_id`）を書きます。
 3. `.env.example` を `.env.local` へコピーし、LIFF ID、XStoryBotのAPIの基点、Bot名を書きます。
 4. シナリオに `##liff.get_status` などを書きます。[サンプルシナリオ](../../projects/demo/xstorybot/)は、デモと同じ動きをXStoryBotで再現します。

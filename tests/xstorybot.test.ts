@@ -7,24 +7,170 @@ afterEach(() => {
 });
 
 describe("LINE: XStoryBot の LIFF API へ送る", () => {
-  const liff = () => ({ getAccessToken: vi.fn(() => "token"), sendMessages: vi.fn(async () => {}), closeWindow: vi.fn() });
+  const liff = () => ({ getIDToken: vi.fn(() => "id-token"), sendMessages: vi.fn(async () => {}), closeWindow: vi.fn() });
   const reply = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 
-  it("アクセストークンを付けて <基点>/liff/<Bot名>/message へ送り、行の配列を返す", async () => {
+  it("IDトークンを付けて <基点>/liff/<Bot名>/message へ送り、行の配列を返す", async () => {
     const fetchStub = vi.fn(async () => reply({ code: 200, result: "Success", message: JSON.stringify(["台詞", "[]"]) }));
     vi.stubGlobal("fetch", fetchStub);
     const client = createLineClient({ liff: liff(), apiBaseUrl: "https://bot.example.com/", bot: "story" });
     expect(await client.request("get_status")).toEqual(["台詞", "[]"]);
     const [url, init] = fetchStub.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://bot.example.com/liff/story/message");
-    expect(init.headers).toMatchObject({ Authorization: "Bearer token" });
+    expect(init.headers).toMatchObject({ Authorization: "Bearer id-token" });
     expect(init.body).toBe(JSON.stringify({ action: "get_status" }));
+  });
+
+  it("要求ごとにSDKのIDトークンを取得し、SDKが同じ値を返す場合も送る", async () => {
+    const sdk = liff();
+    sdk.getIDToken.mockReturnValueOnce("first-id-token").mockReturnValue("next-id-token");
+    const fetchStub = vi.fn(async () => reply({ result: "Success", message: "[]" }));
+    vi.stubGlobal("fetch", fetchStub);
+    const client = createLineClient({ liff: sdk, apiBaseUrl: "https://bot.example.com", bot: "story" });
+    for (const action of ["first", "next", "cached"]) await client.request(action);
+    expect(sdk.getIDToken).toHaveBeenCalledTimes(3);
+    expect(fetchStub.mock.calls.map((call) => (call as unknown as [string, RequestInit])[1].headers)).toEqual([
+      { "Content-Type": "application/json", Authorization: "Bearer first-id-token" },
+      { "Content-Type": "application/json", Authorization: "Bearer next-id-token" },
+      { "Content-Type": "application/json", Authorization: "Bearer next-id-token" }
+    ]);
+  });
+
+  it("IDトークンが無い時とSDKの取得失敗時は、APIを呼ばず認証情報を含まない案内を返す", async () => {
+    const fetchStub = vi.fn();
+    vi.stubGlobal("fetch", fetchStub);
+    const secret = "artificial-token-and-claims";
+    for (const getIDToken of [() => null, () => { throw new Error(secret); }]) {
+      const sdk = { ...liff(), getIDToken, getAccessToken: vi.fn(() => "unused-access-token") };
+      const client = createLineClient({ liff: sdk, apiBaseUrl: "https://bot.example.com", bot: "story" });
+      const error = await client.request("get_status").catch((value: unknown) => value);
+      expect(error).toBeInstanceOf(BotClientError);
+      expect(error).toMatchObject({ code: "unavailable", message: "LINEの認証情報を取得できません。画面を開き直してください。" });
+      expect((error as Error).cause).toBeUndefined();
+      expect(String(error)).not.toContain(secret);
+      expect((error as Error).stack).not.toContain(secret);
+      expect(sdk.getAccessToken).not.toHaveBeenCalled();
+      expect(sdk.closeWindow).toHaveBeenCalledTimes(1);
+      await expect(client.request("again")).rejects.toMatchObject({ code: "closed" });
+    }
+    expect(fetchStub).not.toHaveBeenCalled();
+  });
+
+  it("LINE通信や応答の例外・認証エラー本文を画面とログ用の例外に含めない", async () => {
+    const secret = "artificial-id-token-and-private-claims";
+    const responses = [
+      () => Promise.reject(new Error(secret)),
+      async () => ({ ok: true, json: async () => { throw new Error(secret); } }),
+      async () => reply({ result: "Success", message: secret }),
+      async () => reply({ result: "Failure", message: secret }, 401)
+    ];
+    for (const response of responses) {
+      vi.stubGlobal("fetch", vi.fn(response));
+      const client = createLineClient({ liff: liff(), apiBaseUrl: "https://bot.example.com", bot: "story" });
+      const error = await client.request("get_status").catch((value: unknown) => value);
+      expect(error).toBeInstanceOf(BotClientError);
+      expect((error as Error).cause).toBeUndefined();
+      expect(String(error)).not.toContain(secret);
+      expect((error as Error).stack).not.toContain(secret);
+      expect(JSON.stringify(error)).not.toContain(secret);
+    }
+  });
+
+  it("APIの401では接続を閉じ、閉じる操作が失敗しても元の認証失敗を返す", async () => {
+    const secret = "artificial-close-error-token";
+    for (const failsToClose of [false, true]) {
+      const sdk = liff();
+      if (failsToClose) sdk.closeWindow.mockImplementation(() => { throw new Error(secret); });
+      const fetchStub = vi.fn(async () => reply({ message: secret }, 401));
+      vi.stubGlobal("fetch", fetchStub);
+      const client = createLineClient({ liff: sdk, apiBaseUrl: "https://bot.example.com", bot: "story" });
+      const error = await client.request("get_status").catch((value: unknown) => value);
+      expect(error).toMatchObject({ code: "unavailable", message: "LINEの認証情報を取得できません。画面を開き直してください。" });
+      expect((error as Error).cause).toBeUndefined();
+      expect(String(error)).not.toContain(secret);
+      expect(sdk.closeWindow).toHaveBeenCalledTimes(1);
+      await expect(client.request("again")).rejects.toMatchObject({ code: "closed" });
+      await expect(client.sendText("again")).rejects.toMatchObject({ code: "closed" });
+      expect(fetchStub).toHaveBeenCalledTimes(1);
+      expect(sdk.sendMessages).not.toHaveBeenCalled();
+    }
+  });
+
+  it("sendTextではSDKが明示した認証失敗だけで接続を閉じる", async () => {
+    const secret = "artificial-sdk-token-and-claims";
+    const cases: Array<[Record<string, unknown>, boolean]> = [
+      [{ code: "UNAUTHORIZED" }, true], [{ code: "401" }, true], [{ code: 401 }, true], [{ status: 401 }, true],
+      [{ code: "FORBIDDEN" }, false], [{ code: "403" }, false], [{ status: 403 }, false], [{ code: "INIT_FAILED" }, false], [{}, false]
+    ];
+    for (const [error, authenticationFailed] of cases) {
+      const sdk = liff();
+      sdk.sendMessages.mockRejectedValue(Object.assign(new Error(secret), error));
+      const client = createLineClient({ liff: sdk, apiBaseUrl: "https://bot.example.com", bot: "story" });
+      const failure = await client.sendText("hello").catch((value: unknown) => value);
+      expect(sdk.closeWindow).toHaveBeenCalledTimes(authenticationFailed ? 1 : 0);
+      if (authenticationFailed) {
+        expect(failure).toMatchObject({ code: "unavailable", message: "LINEの認証情報を取得できません。画面を開き直してください。" });
+        expect((failure as Error).cause).toBeUndefined();
+        expect(String(failure)).not.toContain(secret);
+        await expect(client.request("again")).rejects.toMatchObject({ code: "closed" });
+      }
+      expect(sdk.sendMessages).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it("時間切れの後に届いた古い401で、新しい操作を閉じない", async () => {
+    vi.useFakeTimers();
+    const sdk = liff();
+    const replies: Array<(response: Response) => void> = [];
+    const fetchStub = vi.fn(() => new Promise<Response>((resolve) => replies.push(resolve)));
+    vi.stubGlobal("fetch", fetchStub);
+    const client = createLineClient({ liff: sdk, apiBaseUrl: "https://bot.example.com", bot: "story", timeoutMs: 1000 });
+    const first = expect(client.request("slow")).rejects.toMatchObject({ code: "outcome-unknown" });
+    await vi.advanceTimersByTimeAsync(1000);
+    await first;
+    const next = client.request("next");
+    replies[0](reply({}, 401));
+    await vi.advanceTimersByTimeAsync(0);
+    expect(sdk.closeWindow).not.toHaveBeenCalled();
+    replies[1](reply({ result: "Success", message: '["next"]' }));
+    expect(await next).toEqual(["next"]);
+    expect(fetchStub).toHaveBeenCalledTimes(2);
+  });
+
+  it("sendTextの時間切れの後に届いた認証失敗でも、新しい操作を閉じない", async () => {
+    vi.useFakeTimers();
+    const sdk = liff();
+    let rejectSend!: (error: unknown) => void;
+    sdk.sendMessages.mockImplementation(() => new Promise<void>((_resolve, reject) => { rejectSend = reject; }));
+    vi.stubGlobal("fetch", vi.fn(async () => reply({ result: "Success", message: '["next"]' })));
+    const client = createLineClient({ liff: sdk, apiBaseUrl: "https://bot.example.com", bot: "story", timeoutMs: 1000 });
+    const first = expect(client.sendText("slow")).rejects.toMatchObject({ code: "outcome-unknown" });
+    await vi.advanceTimersByTimeAsync(1000);
+    await first;
+    rejectSend({ code: "UNAUTHORIZED" });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(sdk.closeWindow).not.toHaveBeenCalled();
+    expect(await client.request("next")).toEqual(["next"]);
+    expect(sdk.sendMessages).toHaveBeenCalledTimes(1);
+  });
+
+  it("入力の誤りではAPIやSDKを呼ばず、接続も閉じない", async () => {
+    const sdk = liff();
+    const fetchStub = vi.fn();
+    vi.stubGlobal("fetch", fetchStub);
+    const client = createLineClient({ liff: sdk, apiBaseUrl: "https://bot.example.com", bot: "story" });
+    await expect(client.request(1 as unknown as string)).rejects.toMatchObject({ code: "invalid-input" });
+    await expect(client.sendText(null as unknown as string)).rejects.toMatchObject({ code: "invalid-input" });
+    expect(fetchStub).not.toHaveBeenCalled();
+    expect(sdk.sendMessages).not.toHaveBeenCalled();
+    expect(sdk.closeWindow).not.toHaveBeenCalled();
   });
 
   it("失敗の種類を分ける（Botの失敗、認証、結果が分からない）", async () => {
     const cases: Array<[Response | Error, string]> = [
       [reply({ result: "Failure" }), "request-failed"],
       [reply({}, 401), "unavailable"],
+      [reply({}, 403), "unavailable"],
       [reply({}, 500), "request-failed"],
       [new Response("<html>"), "outcome-unknown"],
       [reply({ result: "Success", message: "{}" }), "outcome-unknown"],
@@ -32,19 +178,23 @@ describe("LINE: XStoryBot の LIFF API へ送る", () => {
     ];
     for (const [result, code] of cases) {
       vi.stubGlobal("fetch", vi.fn(async () => (result instanceof Error ? Promise.reject(result) : result)));
-      const client = createLineClient({ liff: liff(), apiBaseUrl: "https://bot.example.com", bot: "story" });
+      const sdk = liff();
+      const client = createLineClient({ liff: sdk, apiBaseUrl: "https://bot.example.com", bot: "story" });
       await expect(client.request("get_status"), code).rejects.toMatchObject({ code });
+      expect(sdk.closeWindow).toHaveBeenCalledTimes(result instanceof Response && result.status === 401 ? 1 : 0);
     }
   });
 
   it("応答が返らなければ、待つ時間の上限で結果が分からないものとして打ち切る", async () => {
     vi.useFakeTimers();
     vi.stubGlobal("fetch", vi.fn((_url: string, init: RequestInit) => new Promise((_resolve, reject) => init.signal?.addEventListener("abort", () => reject(new Error("aborted"))))));
-    const client = createLineClient({ liff: liff(), apiBaseUrl: "https://bot.example.com", bot: "story", timeoutMs: 1000 });
+    const sdk = liff();
+    const client = createLineClient({ liff: sdk, apiBaseUrl: "https://bot.example.com", bot: "story", timeoutMs: 1000 });
     const pending = client.request("get_status");
     const settled = expect(pending).rejects.toMatchObject({ code: "outcome-unknown" });
     await vi.advanceTimersByTimeAsync(1000);
     await settled;
+    expect(sdk.closeWindow).not.toHaveBeenCalled();
   });
 
   it("同時に2つは送らない（busy）。トークへの送信と閉じる操作は LIFF SDK で行う", async () => {
@@ -54,6 +204,7 @@ describe("LINE: XStoryBot の LIFF API へ送る", () => {
     // 応答の返らない要求（待つ時間の上限で失敗するので、受け取っておく）
     client.request("slow").catch(() => {});
     await expect(client.request("next")).rejects.toMatchObject({ code: "busy" });
+    expect(sdk.closeWindow).not.toHaveBeenCalled();
     const other = createLineClient({ liff: sdk, apiBaseUrl: "https://bot.example.com", bot: "story" });
     await other.sendText("こんにちは");
     expect(sdk.sendMessages).toHaveBeenCalledWith([{ type: "text", text: "こんにちは" }]);

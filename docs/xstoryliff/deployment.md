@@ -10,9 +10,9 @@ LIFFアプリは、XStoryBotが使うMessaging APIチャネルと**同じプロ�
 |---|---|
 | サイズ | Full |
 | エンドポイントURL | 画面を置くURL（例: `https://liff.example.com/`） |
-| Scope | `profile`（Botが利用者を確かめるため）、`chat_message.write`（ことばなどをトークへ送るため） |
+| Scope | `openid`（Botが利用者を確かめるため）、トークへ送る場合は `chat_message.write`（ことばなどをトークへ送るため） |
 
-トークへの送信は、LIFFをBotとのトーク画面から開いた時だけ使えます。
+`profile` は本人識別に必要ありません。`openid` が無いと、Botへ送るIDトークンを取得できず、画面を開き直すよう案内します。トークへの送信は、LIFFをBotとのトーク画面から開いた時だけ使えます。
 
 ## 2. XStoryBotにLIFFをつなぐ
 
@@ -32,7 +32,8 @@ bots:
       - type: liff
 ```
 
-- `login_channel_id` は、Messaging APIチャネルではなく、LIFFアプリを作ったLINEログインチャネルのIDです。書かないと、XStoryBotのLIFF APIが503を返します。XStoryBotは、アクセストークンの発行先がこのチャネルかを確かめます。
+- `login_channel_id` は、Messaging APIチャネルではなく、LIFFアプリを作ったLINEログインチャネルのIDです。書かないと、XStoryBotのLIFF APIが503を返します。XStoryBotは、IDトークンの署名と発行先がこのチャネルかを確かめます。
+- IDトークンは通常、LINEの `exp` を過ぎると受け付けません。ページを長時間開いたまま使う場合だけ、`plugins.liff.id_token_max_age_seconds: 86400` を明示すると、`iat` から1日まで受け付けます。LINE SDKの期限を延ばす設定ではありません（[連携仕様](protocol.md#1-通信の形)）。
 - `ignore_unhandled_action: true` にすると、イベントの台本の無いページを開いた時（`intro:words` など）に、空の応答が返ります。XStoryLIFFは、台本が無ければ何もしません。
 
 シナリオには、少なくとも `##liff.get_status` を書きます（[連携仕様](protocol.md)）。
@@ -137,5 +138,6 @@ XSTORYLIFF_PROJECT=demo npm run build:mock -- --base=/xstoryliff-demo/
 
 ## 更新する時の注意
 
+- LINE認証に使うIDトークンの取り決めはXStoryBotと共通です。XStoryLIFFとXStoryBotを一緒に更新し、既存のLIFFアプリのscopeにも `openid` を設定します。旧アクセストークンを送る画面とIDトークンを受け付けるBotを組み合わせないでください。
 - 状態のJSONの項目の意味を変える時は、画面とシナリオを同時に更新します。古い画面が残っていても壊れないよう、項目は足す形で変えるのが安全です。
 - 物語の先で使う画像を、先に作品の `public/` へ置いて公開しても、名前を知っていれば開けます。秘密にはなりません。
